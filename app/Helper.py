@@ -1,66 +1,85 @@
-#this file can update your bot and do other stuff like autorun
+#---------------------------------------------------------------#
+#
+#bot token: 1462769482:AAEU84lWytoJNXkt5bf6rVGjX_fqpqV71ds
+#bot link: t.me/GandalfScreen_bot
+#
+#This file can update your bot and do other stuff like autorun
+#In telegram you can use:
+#   /helper_ping - check if helper is working
+#   /helper_start_bot - starts the Gandalf.exe
+#   /helper_stop_bot - kills the Gandalf.exe process
+#   /helper_update - can update bot configuration:
+#        send a file to telegram and it will update/create it in folder with bot (this commdand can't update helper)
+#
+#---------------------------------------------------------------#
 
 import requests
 import os
 
 api_url = 'https://api.telegram.org/'
-token = 'bot1774401260:AAGhyHAg7Jzb8WvaNS4OmWnOT7UkCzyrKhA'
+token = 'bot1774401260:AAGhyHAg7Jzb8WvaNS4OmWnOT7UkCzyrKhA'     #Bot token url
 url = 'https://api.telegram.org/' + token + '/'
 
-update_offset = 0
+disable_locker = 'taskkill /f /im Locker.exe'                   #Locker disabler
+disable_bot = 'taskkill /f /im Gandalf.exe'                     #Gandalf disabler
+#start_bot = 'wscript.exe Silent_start.vbs Gandalf.exe'          #Gandal starter using silent mode
+start_bot = 'start /min Gandalf.exe'
 
-disable_locker = 'taskkill /f /im Locker.exe'
-disable_bot = 'taskkill /f /im Gandalf.exe'
-start_bot = 'wscript.exe Silent_start.vbs Gandalf.exe'
+update_offset = 0                                               #Offest to avoid updates overflow and recheking old messages
 
-def get_response(request):
+def get_response(request):                                      #Gets all from the link
     response = requests.get(request)
     return response.json()
 
-def get_updates_json(request):                              #Get all updates from bot
+def get_updates_json(request):                                  #Gets all updates from bot
     response = requests.get(request + 'getUpdates?offset=' + str(update_offset))
     return response.json()
 
-def last_update(data):                                      #Get only last update from bot
+def last_update(data):                                          #Gets only last update from json
     results = data['result']
     if len(results) == 0:
         return ''
     total_updates = len(results) - 1
     return results[total_updates]
 
-def get_chat_id(update):                                    #Get chat id from message
+def get_chat_id(update):                                        #Gets chat id from message
     chat_id = update['message']['chat']['id']
     return chat_id
 
-def send_message(chat, text):                               #Send messages
-    params = {'chat_id': chat, 'text': text}
-    response = requests.post(url + 'sendMessage', data=params)
-    return response
-
-def msg_text(msg):
+def msg_text(msg):                                              #Gets message text
     if 'text' in msg['message']:
         return msg['message']['text']
     return ''
 
+def send_message(chat, text):                                   #Send messages
+    params = {'chat_id': chat, 'text': text}
+    response = requests.post(url + 'sendMessage', data=params)
+    return response
 
 
-msg = last_update( get_updates_json(url) )
+#---------------------------------------------------------------#
+
+
+msg = last_update( get_updates_json(url) )                      #Reading old messages to not recheking it later
 update_offset = msg['update_id']
 
 while True:
-    msg = last_update( get_updates_json(url) )
-    if msg != '' and msg['update_id'] != update_offset:
-        update_offset = msg['update_id']          #not to check one message many times
-        master_id = get_chat_id(msg)                        #when scripts start it must run with only one master device
+    msg = last_update( get_updates_json(url) )                  #Checks anything new from bot
+
+    if msg != '' and msg['update_id'] != update_offset:         #If message is new and it isn't empty
+        update_offset = msg['update_id']                        #Not to check one message many times
+        master_id = get_chat_id(msg)                            #When scripts start it must run with only one master device
         
-        if msg_text(msg) == '/helper_ping':
+        if msg_text(msg) == '/helper_ping':                     #Ping 
             send_message(master_id, '.')
 
-        if msg_text(msg) == '/helper_start_bot':
+        if msg_text(msg) == '/helper_start_bot':                #Starting a bot
             os.system(start_bot)
+            send_message(master_id, 'Bot started on ' + str(os.environ['COMPUTERNAME']))
         
-        if msg_text(msg) == '/helper_stop_bot':
+        if msg_text(msg) == '/helper_stop_bot':                 #Stoping a bot
             os.system(disable_bot)
+            send_message(master_id, 'Bot stoped on ' + str(os.environ['COMPUTERNAME']))
         
         #--------------Updater---------------#
 
@@ -68,14 +87,14 @@ while True:
             os.system(disable_bot)
             os.system(disable_locker)
             
-            send_message(master_id, 'send a file')
+            send_message(master_id, str(os.environ['COMPUTERNAME']) + ' ready for update')
             while msg['update_id'] == update_offset:
-                msg = last_update( get_updates_json(url) )
+                msg = last_update( get_updates_json(url) )                                                  #waiting a file
 
             file_id = msg['message']['document']['file_id']
-            file_name = msg['message']['document']['file_name']
-            msg = get_response(api_url + token + '/getFile?file_id=' + file_id)
+            file_name = msg['message']['document']['file_name']                                             #Gets file name
+            msg = get_response(api_url + token + '/getFile?file_id=' + file_id)                             #Gets path by id
             file_path = msg['result']['file_path']
-            update_file = requests.get(api_url + 'file/' + token + '/' + file_path, allow_redirects=True)
+            update_file = requests.get(api_url + 'file/' + token + '/' + file_path, allow_redirects=True)   #Reading a file
 
-            open(file_name, 'wb').write(update_file.content)
+            open(file_name, 'wb').write(update_file.content)                                                #Writing it
