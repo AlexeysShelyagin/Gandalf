@@ -15,7 +15,7 @@ gandalf_link = 'https://youtu.be/Sagg08DrO5U'
 start_locker = 'start Locker.exe'
 disable_locker = 'taskkill /f /im Locker.exe'
 
-last_message_id = -1
+update_offset = 0
 
 def get_updates_json(request):                              #Get all updates from bot
     response = requests.get(request + 'getUpdates')
@@ -53,13 +53,13 @@ def run_gandalf():
 
 
 msg = last_update( get_updates_json(url) )
-last_message_id = msg['message']['message_id']     #not to check messages writed before
+update_offset = msg['update_id']
 
 while True:
     msg = last_update( get_updates_json(url) )
-    if msg != '' and msg['message']['message_id'] != last_message_id:
+    if msg != '' and msg['update_id'] != update_offset:
 
-        last_message_id = msg['message']['message_id']          #not to check one message many times
+        update_offset = msg['update_id']          #not to check one message many times
         master_id = get_chat_id(msg)                        #when scripts start it must run with only one master device
 
         if msg_text(msg) == '/gandalf':

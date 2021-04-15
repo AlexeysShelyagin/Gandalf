@@ -1,5 +1,1 @@
-Dim WShell
-Set WShell = CreateObject("WScript.Shell")
-Set arg = WScript.Arguments
-WShell.Run arg(0), 0
-Set WShell = Nothing
+CreateObject("Wscript.Shell").Run """" & WScript.Arguments(0) & """", 0, False
