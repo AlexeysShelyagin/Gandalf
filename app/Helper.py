@@ -15,15 +15,17 @@
 
 import requests
 import os
+import json
 
-api_url = 'https://api.telegram.org/'
-token = 'bot1774401260:AAGhyHAg7Jzb8WvaNS4OmWnOT7UkCzyrKhA'     #Bot token url
-url = 'https://api.telegram.org/' + token + '/'
+data = json.loads( open('Data.json', 'r').read() )
 
-disable_locker = 'taskkill /f /im Locker.exe'                   #Locker disabler
-disable_bot = 'taskkill /f /im Gandalf.exe'                     #Gandalf disabler
-#start_bot = 'wscript.exe Silent_start.vbs Gandalf.exe'          #Gandal starter using silent mode
-start_bot = 'start /min Gandalf.exe'
+api_url = data["api_url"]
+token = data["token"]                                           #Bot token url
+url = api_url + token + '/'
+
+disable_locker = data["disable_locker"]                         #Locker disabler
+disable_bot = data["disable_bot"]                               #Gandalf disabler
+start_bot = data["start_bot"]                                   #Gandal starter using silent mode
 
 update_offset = 0                                               #Offest to avoid updates overflow and recheking old messages
 

@@ -10,6 +10,7 @@
 #   /block - block keyboard and mouse
 #   /unblock - unblock it
 #   /Gandalf - start Gandalf script (with locking)
+#   /Schedule - set Gandalf start time, format - "min.sec", example: 17.00
 #
 #Write bot start command for helper to start this bot
 #
@@ -20,16 +21,22 @@ import time
 import keyboard
 import ctypes
 import os
+import json
+from datetime import datetime                                   #not to write "datetime.datetime"
 
-api_url = 'https://api.telegram.org/'
-token = 'bot1774401260:AAGhyHAg7Jzb8WvaNS4OmWnOT7UkCzyrKhA'     #Bot token url
-url = 'https://api.telegram.org/' + token + '/'
-gandalf_link = 'https://youtu.be/Sagg08DrO5U'                   #Gandalf video link
+data = json.loads( open('Data.json', 'r').read() )
 
-start_locker = 'start Locker.exe'                               #Start locker
-disable_locker = 'taskkill /f /im Locker.exe'                   #Disable locker
+api_url = data['api_url']
+token = data['token']                                           #Bot token url
+url = api_url + token + '/'
+gandalf_link = data['gandalf_link']                             #Gandalf video link
+
+start_locker = data['start_locker']                             #Start locker
+disable_locker = data['disable_locker']                         #Disable locker
 
 update_offset = 0                                               #Offest to avoid updates overflow and recheking old messages
+start_minute = -1                                                     #gandalf start minutes 
+start_second = -1                                                     #gandalf start seconds
 
 def get_updates_json(request):                                  #Gets all updates from bot
     response = requests.get(request + 'getUpdates?offset=' + str(update_offset))
@@ -57,10 +64,14 @@ def send_message(chat, text):                                   #Send messages
     return response
 
 def run_gandalf():                                              #Gandalf script
-    os.system(start_locker)
-    time.sleep(3)
-    os.system('start ' + gandalf_link)
-    time.sleep(7)
+    #os.system(start_locker)
+    if start_minute == -1:                                      #If not scheluded
+        time.sleep(data['after_block_delay'])
+    else:                                                       #Waiting the right time
+        while datetime.now().time().minute != start_minute or datetime.now().time().second != start_second:
+            time.sleep(0.1)
+    os.system('start ' + gandalf_link)                          #Starting the video
+    time.sleep(data['before_fullscreen_delay'])
     keyboard.press_and_release('f')                             #F - for fullscreen mode
 
 
@@ -81,6 +92,11 @@ while True:
         if msg_text(msg) == '/gandalf':                         #Gandalf
             run_gandalf()
         
+        if msg_text(msg) == '/schedule':                        #Set gandalf run time
+            while msg['update_id'] == update_offset:            #Waiting message with time
+                msg = last_update( get_updates_json(url) )
+            start_minute, start_second = map(int, msg_text(msg).split('.'))
+
         if msg_text(msg) == '/block':                           #Blocking
             os.system(start_locker)
 
