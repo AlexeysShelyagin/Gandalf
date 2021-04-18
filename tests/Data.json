@@ -1,3 +1,13 @@
 {
-    "url": "aaa"
+    "api_url": "https://api.telegram.org/",
+    "token": "bot1774401260:AAGhyHAg7Jzb8WvaNS4OmWnOT7UkCzyrKhA",
+    "gandalf_link": "https://youtu.be/Sagg08DrO5U",
+
+    "start_locker": "start Locker.exe",
+    "disable_locker": "taskkill /f /im Locker.exe",
+    "start_bot": "start /min Gandalf.exe",
+    "disable_bot": "taskkill /f /im Gandalf.exe",
+
+    "after_block_delay": 3,
+    "before_fullscreen_delay": 7
 }

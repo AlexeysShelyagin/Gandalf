@@ -64,10 +64,10 @@ def send_message(chat, text):                                   #Send messages
     return response
 
 def run_gandalf():                                              #Gandalf script
-    #os.system(start_locker)
+    os.system(start_locker)
     if start_minute == -1:                                      #If not scheluded
         time.sleep(data['after_block_delay'])
-    else:                                                       #Waiting the right time
+    else:                                                       #Waiting for the right time
         while datetime.now().time().minute != start_minute or datetime.now().time().second != start_second:
             time.sleep(0.1)
     os.system('start ' + gandalf_link)                          #Starting the video
@@ -78,8 +78,9 @@ def run_gandalf():                                              #Gandalf script
 #---------------------------------------------------------------#
 
 
-msg = last_update( get_updates_json(url) )                      #Reading old messages to not recheking it later
-update_offset = msg['update_id']
+msg = last_update( get_updates_json(url) )                      #Reading old messages to not recheck it later
+if msg != '':
+    update_offset = msg['update_id']
 
 while True:
     msg = last_update( get_updates_json(url) )                  #Checks anything new from bot

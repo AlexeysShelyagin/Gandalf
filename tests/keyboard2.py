@@ -1,9 +1,8 @@
 import keyboard
 
-for i in range(150):
-    keyboard.block_key(i)
+f = open('Rec.txt', 'w')
 
-keyboard.unblock_key(33)
+recorded = keyboard.record(until='esc')
 
-while True:
-    None
+for i in recorded:
+    f.write(str(i) + '\n')

@@ -62,8 +62,9 @@ def send_message(chat, text):                                   #Send messages
 #---------------------------------------------------------------#
 
 
-msg = last_update( get_updates_json(url) )                      #Reading old messages to not recheking it later
-update_offset = msg['update_id']
+msg = last_update( get_updates_json(url) )                      #Reading old messages to not recheсk it later
+if msg != '':
+    update_offset = msg['update_id']
 
 while True:
     msg = last_update( get_updates_json(url) )                  #Checks anything new from bot
